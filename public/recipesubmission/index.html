@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Submission Form</title>
+    <link rel="stylesheet" href="recipe.css">
+</head>
+<body>
+   
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html"><img src="../logo.png" alt="Logo"></a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+
+    <div class="container">
+        <h1>Recipe Submission Form</h1>
+        <form action="/submit" method="post">
+            <label for="recipeName">
+                <input type="text" placeholder="Recipe name" id="recipeName" name="recipe" required>
+            </label>
+            <br>
+            <label for="description">
+                <textarea placeholder="Description" id="description" name="description" required></textarea>
+            </label>
+            <br>
+            <label for="ingredientName">
+                <textarea placeholder="Ingredient" id="ingredientName" name="ingredient" required></textarea>
+            </label>
+            <br>
+            <label for="step">
+                <textarea placeholder="Procedure" id="step" name="procedure" required></textarea>
+            </label>
+            <br>
+            <label for="chefName">
+                <input type="text" placeholder="Name of Chef" id="chefName" name="chefname" required>
+            </label>
+            <br>
+            <label for="img">
+                <input type="file" id="img" name="img" accept="image/png, image/jpeg" />
+            </label>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+      
+</body>
+</html>
