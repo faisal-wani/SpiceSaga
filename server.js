@@ -72,7 +72,7 @@ app.post('/submit', (req, res) => {
     const description = req.body.description;
     const ingredient = req.body.ingredient;
     const procedure = req.body.procedure;
-    const chefName = req.body.chefname;
+    const category = req.body.category;
   
     console.log('Recipe Name:', recipeName);
     console.log('Description:', description);

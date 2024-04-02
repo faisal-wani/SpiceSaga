@@ -23,7 +23,7 @@
 
     <div class="container">
         <h1>Recipe Submission Form</h1>
-        <form action="/submit" method="post">
+        <form action="/submit" method="post" enctype="multipart/form-data">
             <label for="recipeName">
                 <input type="text" placeholder="Recipe name" id="recipeName" name="recipe" required>
             </label>
@@ -40,12 +40,12 @@
                 <textarea placeholder="Procedure" id="step" name="procedure" required></textarea>
             </label>
             <br>
-            <label for="chefName">
-                <input type="text" placeholder="Name of Chef" id="chefName" name="chefname" required>
+            <label for="category">
+                <input type="text" placeholder="category" id="category" name="category" required>
             </label>
             <br>
             <label for="img">
-                <input type="file" id="img" name="img" accept="image/png, image/jpeg" />
+                <input type="file" id="img" name="img" accept="image/png, image/jpeg"  required>
             </label>
             <br>
             <button type="submit">Submit</button>
