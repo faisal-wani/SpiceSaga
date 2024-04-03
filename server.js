@@ -1,10 +1,32 @@
 import  Express from "express";
+import mariadb from "mariadb";
 import bodyParser from "body-parser";
 var app = Express();
 const port = 3000;
 app.use(Express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
    
+
+//connecting database
+const pool = mariadb.createPool({
+    host: 'localhost', // Replace with your MariaDB host
+    user: 'root', // Replace with your MariaDB username
+    password: '8825', // Replace with your MariaDB password
+    database: 'spicesaga', // Replace with your MariaDB database name
+    connectionLimit: 5, // Adjust as needed
+});
+pool.getConnection()
+.then((conn) => {
+    console.log('Connected to the MariaDB database!');
+    conn.release(); // Release the connection back to the pool
+    // Perform your queries or other operations here
+})
+.catch((err) => {
+    console.error('Error connecting to the database:', err);
+});
+
+  
+
 
 
      // post request from search bar
