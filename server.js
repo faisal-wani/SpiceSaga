@@ -1,115 +1,111 @@
-import  Express from "express";
+import express from "express";
 import mariadb from "mariadb";
+import session from 'express-session';
 import bodyParser from "body-parser";
-var app = Express();
+
+const app = express();
 const port = 3000;
-app.use(Express.static('public'));
+
+app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-   
+//maintaing session
+const sessionMiddleware = session({
+    secret: 'mylongrandomstringforsessioncookie',
+    resave: false,
+    saveUninitialized: false
+});
+app.use(sessionMiddleware);
 
-//connecting database
+
+// Create a database connection pool
 const pool = mariadb.createPool({
-    host: 'localhost', // Replace with your MariaDB host
-    user: 'root', // Replace with your MariaDB username
-    password: '8825', // Replace with your MariaDB password
-    database: 'spicesaga', // Replace with your MariaDB database name
-    connectionLimit: 5, // Adjust as needed
+    host: 'localhost',
+    user: 'root',
+    password: '8825',
+    database: 'spicesaga',
+    connectionLimit: 5
 });
+
+// Test database connection
 pool.getConnection()
-.then((conn) => {
-    console.log('Connected to the MariaDB database!');
-    conn.release(); // Release the connection back to the pool
-    // Perform your queries or other operations here
-})
-.catch((err) => {
-    console.error('Error connecting to the database:', err);
-});
-
-  
-
-
-
-     // post request from search bar
-        app.post('/search', (req, res) => {
-        const query = req.body.query;
-        res.send(`Searching for: ${query}`);
+    .then(conn => {
+        console.log('Connected to the MariaDB database!');
+        conn.release();
+    })
+    .catch(err => {
+        console.error('Error connecting to the database:', err);
     });
 
-
-    //post request from dropdown bar
-    app.post('/select', (req, res) => {
-        const category = req.body.category;
-        // Handle the category in the way you need
-        res.send(`Searching for: ${category}`);
-    });
+// Handle login
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+  //   Query the database to check credentials
     
+    pool.query('SELECT * FROM user WHERE username = ? OR email=? AND password = ?', [username,username, password])
+       .then(results => {
+           if (results.length > 0) {
+                req.session.user = results[0];
+                res.send('<script>alert("Login successful!"); window.location.href="/";</script>');
+           } else {
+              res.status(401).send('Invalid username or password');
+          }
+       })
+        .catch(err => {
+            console.error('Error executing query:', err);
+            res.status(500).send('Internal server error');
+        });
 
-
-   //login
-   app.post('/login', (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    res.send('Login successful');
 });
 
-
-
-//  registration POST request
+// Handle registration
 app.post('/register', (req, res) => {
-    const firstname = req.body.firstname;
-    const lastname = req.body.lastname;
-    const email = req.body.email;
-    const password = req.body.password;
-    res.send('Registration successful');
+    const { firstname, lastname, email, password } = req.body;
+    // Insert new user data into the database
+    const username = `${firstname.toLowerCase()}_${lastname.toLowerCase()}`;
+    pool.query('INSERT INTO user (username, email, password) VALUES (?, ?, ?)', [username, email, password])
+        .then(results => {
+            req.session.user = { username, email };
+            res.redirect('/');
+        })
+        .catch(err => {
+            console.error('Error executing query:', err);
+            res.status(500).send('Internal server error');
+        });
 });
 
 
-
-
-//request from qrosel
-
-
-app.post('/endpoint1', (req, res) => {
-    
-    console.log('Received post request for endpoint1');
-    res.send('Post request received for endpoint1');
+// Handle search
+app.post('/search', (req, res) => {
+    const query = req.body.query;
+    res.send(`Searching for: ${query}`);
 });
 
-app.post('/endpoint2', (req, res) => {
-    console.log('Received post request for endpoint2');
-    res.send('Post request received for endpoint2');
-});
-
-app.post('/endpoint3', (req, res) => {
-    console.log('Received post request for endpoint3');
-    res.send('Post request received for endpoint3');
-});
-
-
-
-//request for recipe submission
+// Handle recipe submission
 app.post('/submit', (req, res) => {
-    // Extract form data from request body
-    const recipeName = req.body.recipe;
-    const description = req.body.description;
-    const ingredient = req.body.ingredient;
-    const procedure = req.body.procedure;
-    const category = req.body.category;
-  
+    const { recipeName, description, ingredient, procedure, category } = req.body;
+    // Insert new recipe data into the database
+    // Example:
+    // pool.query('INSERT INTO recipes (recipeName, description, ingredient, procedure, category) VALUES (?, ?, ?, ?, ?)', [recipeName, description, ingredient, procedure, category])
+    //     .then(results => {
+    //         res.send('Form submitted successfully!');
+    //     })
+    //     .catch(err => {
+    //         console.error('Error executing query:', err);
+    //         res.status(500).send('Internal server error');
+    //     });
     console.log('Recipe Name:', recipeName);
     console.log('Description:', description);
     console.log('Ingredient:', ingredient);
     console.log('Procedure:', procedure);
-    console.log('Chef Name:', chefName);
-    
     res.send('Form submitted successfully!');
-   
 });
 
-//ending recipe submission
-    
-    
-
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Internal server error');
+});
 
 app.listen(port, () => {
-console.log( `Server running on port ${port}`)});
+    console.log(`Server running on port ${port}`);
+});
