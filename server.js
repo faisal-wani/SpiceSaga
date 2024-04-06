@@ -3,10 +3,27 @@ import mariadb from "mariadb";
 import session from 'express-session';
 import bodyParser from "body-parser";
 import multer from 'multer';
-import path from 'path';
 
+
+import { fileURLToPath } from 'url';
+import path from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
+app.set('views', path.join(__dirname, 'views'));
+
+
+
 const port = 3000;
+
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); 
+
+
+
+
+
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,7 +68,7 @@ app.post('/login', (req, res) => {
     pool.query('SELECT * FROM user WHERE (username = ? OR email = ?) AND password = ?', [username, username, password])
         .then(results => {
             if (results.length > 0) {
-                req.session.user_id = results[0].user_id;
+                req.session.user_id = Number(results[0].user_id);
                 res.send('<script>alert("Login successful!"); window.location.href="/";</script>');
             } else {
                 res.status(401).send('Invalid username or password');
@@ -68,7 +85,7 @@ app.post('/register', (req, res) => {
     const username = `${firstname.toLowerCase()}_${lastname.toLowerCase()}`;
     pool.query('INSERT INTO user (username, email, password) VALUES (?, ?, ?)', [username, email, password])
         .then(results => {
-            req.session.user_id = results.insertId;
+            req.session.user_id = Number(results.insertId);
             res.send('<script>alert("registration successful!"); window.location.href="/";</script>');
         })
         .catch(err => {
@@ -77,10 +94,16 @@ app.post('/register', (req, res) => {
         });
 });
 
+
+
+
 app.post('/search', (req, res) => {
     const query = req.body.query;
     res.send(`Searching for: ${query}`);
 });
+
+
+
 
 app.post('/submit', upload.single('recipeImage'), (req, res) => {
     const { recipe, description, ingredient, procedure, category } = req.body;
@@ -118,6 +141,49 @@ app.post('/submit', upload.single('recipeImage'), (req, res) => {
             res.status(500).send('Internal server error');
         });
 });
+
+
+
+
+// GET request for /myaccount
+app.get('/myaccount', (req, res) => {
+    // Check if user is logged in, if not, redirect to login page
+    if (!req.session.user_id) {
+        return res.redirect('/project/login.html');
+    }
+
+    // Fetch user data from the database
+    pool.query('SELECT * FROM user WHERE user_id = ?', [req.session.user_id])
+        .then(results => {
+            // Render myaccount.ejs with fetched data
+            res.render('myaccount', { user: results[0] });
+        })
+        .catch(err => {
+            console.error('Error executing query:', err);
+            res.status(500).send('Internal server error');
+        });
+});
+// GET route for the logout page
+app.get('/logout', (req, res) => {
+    // Perform logout operation here, such as destroying the session
+    // For example, if you are using sessions with Express.js:
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            // Handle error
+            res.status(500).send('Internal Server Error');
+        } else {
+            // Redirect the user to the login page or any other page after logout
+            res.redirect('/'); // Redirect to the login page
+        }
+    });
+});
+
+
+
+
+
+
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

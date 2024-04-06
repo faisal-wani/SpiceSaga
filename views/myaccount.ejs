@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> 
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif; /* Use a modern font */
+            background-color: #f4f4f4; /* Use a light background color */
+        }
+
+        .container {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            padding-top: 60px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff; /* Use a white background for the content */
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+
+        .user-info {
+            margin: 20px;
+        }
+        .user-info h2 {
+            margin-bottom: 10px;
+            color: #333; /* Use a dark color for the text */
+            font-weight: 700; /* Make the text bold */
+        }
+
+        /* New styles for user-info */
+        .user-info p {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        /* Style for logout button */
+        .logout-button {
+            background-color: #333; /* Use a dark background color */
+            color: #fff; /* Use a light text color */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <%- include("partials/navbar.ejs") %>
+
+    <div class="container">
+        <div class="content">
+            <div class="user-info">
+                <h2>User Information</h2>
+                <p><strong>Username:</strong> <%= user.username %></p>
+                <p><strong>Email:</strong> <%= user.email %></p>
+                <a href="/logout" class="logout-button">Logout</a>
+
+                 <!-- Logout button -->
+            </div>
+        </div>
+    </div>
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>
