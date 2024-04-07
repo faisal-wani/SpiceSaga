@@ -26,6 +26,11 @@ app.set('views', path.join(__dirname, 'views'));
 
 
 app.use(express.static('public'));
+
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 app.use(bodyParser.urlencoded({ extended: true }));
 //maintaining session
 const sessionMiddleware = session({
@@ -97,10 +102,86 @@ app.post('/register', (req, res) => {
 
 
 
-app.post('/search', (req, res) => {
-    const query = req.body.query;
-    res.send(`Searching for: ${query}`);
+
+
+
+app.get('/search', (req, res) => {
+    const searchTerm = req.query.query; // Assuming the search term is passed as a query parameter
+
+    // Search for recipes based on the search term
+    const recipeQuery = `
+        SELECT * 
+        FROM recipe 
+        WHERE name LIKE '%${searchTerm}%' 
+        OR ingredients LIKE '%${searchTerm}%'
+    `;
+
+    // Execute the recipe query
+    pool.query(recipeQuery)
+        .then(recipeResults => {
+            if (recipeResults.length > 0) {
+                // Parse image_path and update search results
+                const searchResults = recipeResults.map(recipe => {
+                    const imagePathObject = JSON.parse(recipe.image_path);
+                    return {
+                        ...recipe,
+                        image_path: imagePathObject.path
+                    };
+                });
+                // Render the search results with parsed image paths
+                res.render('search', { searchResults: searchResults });
+            } else {
+                // If no recipes are found, search for categories
+                const categoryQuery = `
+                SELECT rc.recipe_id AS category_recipe_id, r.*, u.username
+                FROM recipe_category rc
+                JOIN recipe r ON rc.recipe_id = r.recipe_id
+                JOIN category c ON rc.category_id = c.category_id
+                LEFT JOIN user u ON r.user_id = u.user_id
+                WHERE c.name LIKE '%${searchTerm}%';
+                
+                
+
+
+                
+                `;
+
+                // Execute the category query
+                pool.query(categoryQuery)
+                    .then(categoryResults => {
+                        if (categoryResults.length > 0) {
+                            // Parse image_path and update search results
+                            const searchResults = categoryResults.map(recipe => {
+                                const imagePathObject = JSON.parse(recipe.image_path);
+                                return {
+                                    ...recipe,
+                                    image_path: imagePathObject.path
+                                };
+                            });
+                            // Render the search results with parsed image paths
+                            res.render('search', { searchResults: searchResults });
+                        } else {
+                            // If no recipes or categories are found, render empty search results
+                            res.render('search', { searchResults: [] });
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error executing category query:', err);
+                        res.status(500).send('Internal server error');
+                    });
+            }
+        })
+        .catch(err => {
+            console.error('Error executing recipe query:', err);
+            res.status(500).send('Internal server error');
+        });
 });
+
+
+
+
+
+
 
 
 
