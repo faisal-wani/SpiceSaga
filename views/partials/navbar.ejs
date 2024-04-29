@@ -24,17 +24,17 @@
           <li class="nav-item dropdown"> <!-- Added dropdown class here -->
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">CATEGORIES</a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <li><a class="dropdown-item" href="#" onclick="submitForm('Category 1')">Category 1</a></li>
-        <li><a class="dropdown-item" href="#" onclick="submitForm('Category 2')">Category 2</a></li>
-        <li><a class="dropdown-item" href="#" onclick="submitForm('Category 3')">Category 3</a></li>
+        <li><a class="dropdown-item" href="#" onclick="submitForm('breakfast')">breakfast</a></li>
+        <li><a class="dropdown-item" href="#" onclick="submitForm('dinner')">dinner</a></li>
+        <li><a class="dropdown-item" href="#" onclick="submitForm('lunch')">lunch</a></li>
         <script>
           function submitForm(category) {
             const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/select';
+            form.method = 'get';
+            form.action = '/search';
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = 'category';
+            input.name = 'query';
             input.value = category;
             form.appendChild(input);
             document.body.appendChild(form);

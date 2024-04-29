@@ -19,8 +19,6 @@
         </div>
     </nav>
 
-
-
     <div class="container">
         <h1>Recipe Submission Form</h1>
         <form action="/submit" method="post" enctype="multipart/form-data">
@@ -33,11 +31,11 @@
             </label>
             <br>
             <label for="ingredientName">
-                <textarea placeholder="Ingredient" id="ingredientName" name="ingredient" required></textarea>
+                <textarea placeholder="Ingredient (separate each ingredient with '-')" id="ingredientName" name="ingredient" required></textarea>
             </label>
             <br>
             <label for="step">
-                <textarea placeholder="Procedure" id="step" name="procedure" required></textarea>
+                <textarea placeholder="Procedure (separate each step with '-')" id="step" name="procedure" required></textarea>
             </label>
             <br>
             <label for="category">
@@ -45,11 +43,11 @@
             </label>
             <br>
             <label for="img">
-                <input type="file" id="img" name="recipeImage"   required>
+                <input type="file" id="img" name="recipeImage" required>
             </label>
             <br>
             <button type="submit">Submit</button>
         </form>
-      
+    </div>
 </body>
 </html>
